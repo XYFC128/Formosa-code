@@ -24,12 +24,14 @@ private slots:
 private:
     bool SetupEditor(QString s);
     bool SetupKeyList();
+
     void createActions();
     void createMenus();
-    //void createToolBars();
     void createStatusBar();
+
     void readSettings();
     void writeSettings();
+
     bool maybeSave();
     void loadFile(const QString &fileName);
     bool saveFile(const QString &fileName);
@@ -42,8 +44,6 @@ private:
     QMenu *fileMenu;
     QMenu *editMenu;
     QMenu *helpMenu;
-    QToolBar *fileToolBar;
-    QToolBar *editToolBar;
     QAction *newAct;
     QAction *openAct;
     QAction *saveAct;

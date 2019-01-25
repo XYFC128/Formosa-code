@@ -25,7 +25,13 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-unix:!macx: LIBS += -L$$PWD/Scintilla/ -lqscintilla2_qt5
+
+win32: LIBS += -L$$PWD/Scintilla-win/ -lqscintilla2_qt5
+
+INCLUDEPATH += $$PWD/Scintilla-win
+DEPENDPATH += $$PWD/Scintilla-win
+
+unix: LIBS += -L$$PWD/Scintilla/ -lqscintilla2_qt5
 
 INCLUDEPATH += $$PWD/Scintilla
 DEPENDPATH += $$PWD/Scintilla

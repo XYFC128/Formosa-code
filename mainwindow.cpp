@@ -21,11 +21,12 @@
 #include <Qsci/qsciapis.h>
 #include "mainwindow.h"
 
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     SetupKeyList();
-    SetupEditor("null");
+    SetupEditor("txt");
     setCentralWidget(textEdit);
 
 
@@ -138,10 +139,10 @@ bool MainWindow::saveAs()
 
 void MainWindow::about()
 {
-   QMessageBox::about(this, tr("About Application"),
-            tr("The <b>Application</b> example demonstrates how to "
-               "write modern GUI applications using Qt, with a menu bar, "
-               "toolbars, and a status bar."));
+   QMessageBox::about(this, tr("關於Formosa code"),
+            tr("<b>Formosa code</b>是我在閒暇時間開發的一款文字編輯器<br>"
+               "支援基本的語法高亮和自動完成程式碼<br>"
+               "感謝您的使用<br>"));
 }
 
 void MainWindow::documentWasModified()
@@ -151,50 +152,48 @@ void MainWindow::documentWasModified()
 
 void MainWindow::createActions()
 {
-    newAct = new QAction(tr("&New"), this);
+    newAct = new QAction(tr("&新增"), this);
     newAct->setShortcut(tr("Ctrl+N"));
-    newAct->setStatusTip(tr("Create a new file"));
+    newAct->setStatusTip(tr("新增檔案"));
     connect(newAct, SIGNAL(triggered()), this, SLOT(newFile()));
 
-    openAct = new QAction(tr("&Open..."), this);
+    openAct = new QAction(tr("&開啟..."), this);
     openAct->setShortcut(tr("Ctrl+O"));
-    openAct->setStatusTip(tr("Open an existing file"));
+    openAct->setStatusTip(tr("開啟檔案"));
     connect(openAct, SIGNAL(triggered()), this, SLOT(open()));
 
-    saveAct = new QAction(tr("&Save"), this);
+    saveAct = new QAction(tr("&儲存"), this);
     saveAct->setShortcut(tr("Ctrl+S"));
-    saveAct->setStatusTip(tr("Save the document to disk"));
+    saveAct->setStatusTip(tr("儲存檔案"));
     connect(saveAct, SIGNAL(triggered()), this, SLOT(save()));
 
-    saveAsAct = new QAction(tr("Save &As..."), this);
-    saveAsAct->setStatusTip(tr("Save the document under a new name"));
+    saveAsAct = new QAction(tr("另存新檔..."), this);
+    saveAsAct->setShortcut(tr("Ctrl+Shift+S"));
+    saveAsAct->setStatusTip(tr("將檔案儲存成其他名稱"));
     connect(saveAsAct, SIGNAL(triggered()), this, SLOT(saveAs()));
 
-    exitAct = new QAction(tr("E&xit"), this);
+    exitAct = new QAction(tr("離開"), this);
     exitAct->setShortcut(tr("Ctrl+Q"));
-    exitAct->setStatusTip(tr("Exit the application"));
+    exitAct->setStatusTip(tr("關閉程式"));
     connect(exitAct, SIGNAL(triggered()), this, SLOT(close()));
 
-    cutAct = new QAction(tr("Cu&t"), this);
+    cutAct = new QAction(tr("剪下"), this);
     cutAct->setShortcut(tr("Ctrl+X"));
-    cutAct->setStatusTip(tr("Cut the current selection's contents to the "
-                            "clipboard"));
+    cutAct->setStatusTip(tr("剪下所選內容"));
     connect(cutAct, SIGNAL(triggered()), textEdit, SLOT(cut()));
 
-    copyAct = new QAction(tr("&Copy"), this);
+    copyAct = new QAction(tr("&複製"), this);
     copyAct->setShortcut(tr("Ctrl+C"));
-    copyAct->setStatusTip(tr("Copy the current selection's contents to the "
-                             "clipboard"));
+    copyAct->setStatusTip(tr("複製所選內容"));
     connect(copyAct, SIGNAL(triggered()), textEdit, SLOT(copy()));
 
-    pasteAct = new QAction(tr("&Paste"), this);
+    pasteAct = new QAction(tr("&貼上"), this);
     pasteAct->setShortcut(tr("Ctrl+V"));
-    pasteAct->setStatusTip(tr("Paste the clipboard's contents into the current "
-                              "selection"));
+    pasteAct->setStatusTip(tr("貼上剪貼簿內容"));
     connect(pasteAct, SIGNAL(triggered()), textEdit, SLOT(paste()));
 
-    aboutAct = new QAction(tr("&About"), this);
-    aboutAct->setStatusTip(tr("Show the application's About box"));
+    aboutAct = new QAction(tr("&關於"), this);
+    aboutAct->setStatusTip(tr("關於本程式"));
     connect(aboutAct, SIGNAL(triggered()), this, SLOT(about()));
 
     aboutQtAct = new QAction(tr("About &Qt"), this);
@@ -211,7 +210,7 @@ void MainWindow::createActions()
 
 void MainWindow::createMenus()
 {
-    fileMenu = menuBar()->addMenu(tr("&File"));
+    fileMenu = menuBar()->addMenu(tr("&檔案"));
     fileMenu->addAction(newAct);
     fileMenu->addAction(openAct);
     fileMenu->addAction(saveAct);
@@ -219,21 +218,21 @@ void MainWindow::createMenus()
     fileMenu->addSeparator();
     fileMenu->addAction(exitAct);
 
-    editMenu = menuBar()->addMenu(tr("&Edit"));
+    editMenu = menuBar()->addMenu(tr("&編輯"));
     editMenu->addAction(cutAct);
     editMenu->addAction(copyAct);
     editMenu->addAction(pasteAct);
 
     menuBar()->addSeparator();
 
-    helpMenu = menuBar()->addMenu(tr("&Help"));
+    helpMenu = menuBar()->addMenu(tr("&幫助"));
     helpMenu->addAction(aboutAct);
     helpMenu->addAction(aboutQtAct);
 }
 
 void MainWindow::createStatusBar()
 {
-    statusBar()->showMessage(tr("Ready"));
+    statusBar()->showMessage(tr("就緒"));
 }
 
 void MainWindow::readSettings()
@@ -255,9 +254,9 @@ void MainWindow::writeSettings()
 bool MainWindow::maybeSave()
 {
     if (textEdit->isModified()) {
-        int ret = QMessageBox::warning(this, tr("Application"),
-                     tr("The document has been modified.\n"
-                        "Do you want to save your changes?"),
+        int ret = QMessageBox::warning(this, tr("警告"),
+                     tr("變更尚未儲存\n"
+                        "是否要儲存?"),
                      QMessageBox::Yes | QMessageBox::Default,
                      QMessageBox::No,
                      QMessageBox::Cancel | QMessageBox::Escape);
@@ -273,8 +272,8 @@ void MainWindow::loadFile(const QString &fileName)
 {
     QFile file(fileName);
     if (!file.open(QFile::ReadOnly)) {
-        QMessageBox::warning(this, tr("Application"),
-                             tr("Cannot read file %1:\n%2.")
+        QMessageBox::warning(this, tr("警告"),
+                             tr("無法載入檔案餒 %1 \n錯誤資訊:%2.")
                              .arg(fileName)
                              .arg(file.errorString()));
         return;
@@ -287,15 +286,15 @@ void MainWindow::loadFile(const QString &fileName)
     textEdit->setText(in.readAll());
     QApplication::restoreOverrideCursor();
     setCurrentFile(fileName);
-    statusBar()->showMessage(tr("File loaded"), 2000);
+    statusBar()->showMessage(tr("檔案載入完成"), 2000);
 }
 
 bool MainWindow::saveFile(const QString &fileName)
 {
     QFile file(fileName);
     if (!file.open(QFile::WriteOnly)) {
-        QMessageBox::warning(this, tr("Application"),
-                             tr("Cannot write file %1:\n%2.")
+        QMessageBox::warning(this, tr("警告"),
+                             tr("無法寫入檔案 %1 \n 錯誤資訊:%2.")
                              .arg(fileName)
                              .arg(file.errorString()));
         return false;
@@ -307,7 +306,7 @@ bool MainWindow::saveFile(const QString &fileName)
     QApplication::restoreOverrideCursor();
 
     setCurrentFile(fileName);
-    statusBar()->showMessage(tr("File saved"), 2000);
+    statusBar()->showMessage(tr("儲存成功"), 2000);
     return true;
 }
 
