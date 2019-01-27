@@ -9,7 +9,7 @@
 #include <Qsci/qscilexercpp.h>
 #include <Qsci/qscilexerpython.h>
 #include <Qsci/qsciapis.h>
-codeEditor::codeEditor(QMainWindow *parent){
+codeEditor::codeEditor(){
     SetupKeyList();
     SetupEditor();
     setAcceptDrops(true);
@@ -23,7 +23,7 @@ bool codeEditor::SetupEditor(){
     this->setMarginWidth(0,31);
 
     this->setAutoCompletionSource(QsciScintilla::AcsAll);
-    this->setAutoCompletionCaseSensitivity(true);
+    //this->setAutoCompletionCaseSensitivity(false);
     this->setAutoCompletionThreshold(2);
     this->setFont(QFont("Courier New"));
     this->SendScintilla(QsciScintilla::SCI_SETCODEPAGE,QsciScintilla::SC_CP_UTF8);
@@ -41,8 +41,30 @@ bool codeEditor::SetupKeyList(){
              <<"finally"<<"return"<<"for"<<"lambda"<<"try";
     return  true;
 }
-bool codeEditor::saveFile(const QString &fileName)
+bool codeEditor::saveFile()
 {
+    QFile file(curFile);
+    if (!file.open(QFile::WriteOnly)) {
+        QMessageBox::warning(this, tr("警告"),
+                             tr("無法寫入檔案 %1 \n 錯誤資訊:%2.")
+                             .arg(curFile)
+                             .arg(file.errorString()));
+        return false;
+    }
+
+    QTextStream out(&file);
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    out << this->text();
+    QApplication::restoreOverrideCursor();
+    this->setModified(false);
+    setCurrentFile(curFile);
+    return true;
+}
+bool codeEditor::saveAs(const QString &fileName)
+{
+    if(fileName.isEmpty()){
+        return false;
+    }
     QFile file(fileName);
     if (!file.open(QFile::WriteOnly)) {
         QMessageBox::warning(this, tr("警告"),
@@ -133,4 +155,20 @@ void codeEditor::dropEvent(QDropEvent *event){
         return;
     }
     this->loadFile(fileName);
+}
+
+bool codeEditor::maybeSave(){
+    if (this->isModified()) {
+        int ret = QMessageBox::warning(this, tr("警告"),
+                     tr("變更尚未儲存\n"
+                        "是否要儲存?"),
+                     QMessageBox::Yes | QMessageBox::Default,
+                     QMessageBox::No,
+                     QMessageBox::Cancel | QMessageBox::Escape);
+        if (ret == QMessageBox::Yes)
+            return saveFile();
+        else if (ret == QMessageBox::Cancel)
+            return false;
+    }
+    return true;
 }

@@ -2,8 +2,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QDockWidget>
 #include <Qsci/qsciscintilla.h>
 #include "editor.h"
+#include "fileview.h"
 
 class MainWindow : public QMainWindow
 {
@@ -31,13 +33,13 @@ private:
     void readSettings();
     void writeSettings();
 
-    bool maybeSave();
-
     codeEditor *textEdit;
     QString curFile;
     QMenu *fileMenu;
     QMenu *editMenu;
     QMenu *helpMenu;
+    fileViewer *fileManger;
+
     QAction *newAct;
     QAction *openAct;
     QAction *saveAct;

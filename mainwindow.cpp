@@ -16,10 +16,10 @@
 #include <QToolBar>
 #include <QUrl>
 #include <QMimeData>
-
 #include <QDragEnterEvent>
 #include "mainwindow.h"
 #include "editor.h"
+#include "fileview.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -36,6 +36,9 @@ MainWindow::MainWindow(QWidget *parent)
     textEdit->newFile();
     setWindowTitle(textEdit->title);
 
+    fileManger = new fileViewer(textEdit);
+    addDockWidget(Qt::RightDockWidgetArea,fileManger);
+
 }
 
 MainWindow::~MainWindow()
@@ -45,7 +48,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    if (maybeSave()) {
+    if (textEdit->maybeSave()) {
         writeSettings();
         event->accept();
     } else {
@@ -56,7 +59,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::newFile()
 {
-    if (maybeSave()) {
+    if (textEdit->maybeSave()) {
         textEdit->newFile();
         setWindowTitle(textEdit->title);
     }
@@ -64,12 +67,13 @@ void MainWindow::newFile()
 
 void MainWindow::open()
 {
-    if (maybeSave()) {
+    if (textEdit->maybeSave()) {
         QString fileName = QFileDialog::getOpenFileName(this);
-        if (!fileName.isEmpty())
+        if (!fileName.isEmpty()){
             textEdit->loadFile(fileName);
             setWindowTitle(textEdit->title);
             statusBar()->showMessage(tr("檔案載入完成"), 2000);
+        }
     }
 }
 
@@ -78,7 +82,7 @@ bool MainWindow::save()
     if (curFile.isEmpty()) {
         return saveAs();
     } else {
-        textEdit->saveFile(curFile);
+        textEdit->saveFile();
         setWindowTitle(textEdit->title);
         return true;
     }
@@ -90,7 +94,7 @@ bool MainWindow::saveAs()
     QString fileName = QFileDialog::getSaveFileName(this);
     if (fileName.isEmpty())
         return false;
-    textEdit->saveFile(fileName);
+    textEdit->saveAs(fileName);
     setWindowTitle(textEdit->title);
     return true;
 }
@@ -111,17 +115,17 @@ void MainWindow::documentWasModified()
 
 void MainWindow::createActions()
 {
-    newAct = new QAction(tr("&新增"), this);
+    newAct = new QAction(tr("新增"), this);
     newAct->setShortcut(tr("Ctrl+N"));
     newAct->setStatusTip(tr("新增檔案"));
     connect(newAct, SIGNAL(triggered()), this, SLOT(newFile()));
 
-    openAct = new QAction(tr("&開啟..."), this);
+    openAct = new QAction(tr("開啟..."), this);
     openAct->setShortcut(tr("Ctrl+O"));
     openAct->setStatusTip(tr("開啟檔案"));
     connect(openAct, SIGNAL(triggered()), this, SLOT(open()));
 
-    saveAct = new QAction(tr("&儲存"), this);
+    saveAct = new QAction(tr("儲存"), this);
     saveAct->setShortcut(tr("Ctrl+S"));
     saveAct->setStatusTip(tr("儲存檔案"));
     connect(saveAct, SIGNAL(triggered()), this, SLOT(save()));
@@ -141,17 +145,17 @@ void MainWindow::createActions()
     cutAct->setStatusTip(tr("剪下所選內容"));
     connect(cutAct, SIGNAL(triggered()), textEdit, SLOT(cut()));
 
-    copyAct = new QAction(tr("&複製"), this);
+    copyAct = new QAction(tr("複製"), this);
     copyAct->setShortcut(tr("Ctrl+C"));
     copyAct->setStatusTip(tr("複製所選內容"));
     connect(copyAct, SIGNAL(triggered()), textEdit, SLOT(copy()));
 
-    pasteAct = new QAction(tr("&貼上"), this);
+    pasteAct = new QAction(tr("貼上"), this);
     pasteAct->setShortcut(tr("Ctrl+V"));
     pasteAct->setStatusTip(tr("貼上剪貼簿內容"));
     connect(pasteAct, SIGNAL(triggered()), textEdit, SLOT(paste()));
 
-    aboutAct = new QAction(tr("&關於"), this);
+    aboutAct = new QAction(tr("關於"), this);
     aboutAct->setStatusTip(tr("關於本程式"));
     connect(aboutAct, SIGNAL(triggered()), this, SLOT(about()));
 
@@ -169,7 +173,7 @@ void MainWindow::createActions()
 
 void MainWindow::createMenus()
 {
-    fileMenu = menuBar()->addMenu(tr("&檔案"));
+    fileMenu = menuBar()->addMenu(tr("檔案"));
     fileMenu->addAction(newAct);
     fileMenu->addAction(openAct);
     fileMenu->addAction(saveAct);
@@ -177,13 +181,13 @@ void MainWindow::createMenus()
     fileMenu->addSeparator();
     fileMenu->addAction(exitAct);
 
-    editMenu = menuBar()->addMenu(tr("&編輯"));
+    editMenu = menuBar()->addMenu(tr("編輯"));
     editMenu->addAction(cutAct);
     editMenu->addAction(copyAct);
     editMenu->addAction(pasteAct);
 
 
-    helpMenu = menuBar()->addMenu(tr("&幫助"));
+    helpMenu = menuBar()->addMenu(tr("幫助"));
     helpMenu->addAction(aboutAct);
     helpMenu->addAction(aboutQtAct);
 }
@@ -211,19 +215,3 @@ void MainWindow::writeSettings()
     settings.setValue("size", size());
 }
 
-bool MainWindow::maybeSave()
-{
-    if (textEdit->isModified()) {
-        int ret = QMessageBox::warning(this, tr("警告"),
-                     tr("變更尚未儲存\n"
-                        "是否要儲存?"),
-                     QMessageBox::Yes | QMessageBox::Default,
-                     QMessageBox::No,
-                     QMessageBox::Cancel | QMessageBox::Escape);
-        if (ret == QMessageBox::Yes)
-            return save();
-        else if (ret == QMessageBox::Cancel)
-            return false;
-    }
-    return true;
-}

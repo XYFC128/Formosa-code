@@ -1,14 +1,16 @@
 #ifndef EDITOR_H
 #define EDITOR_H
 #include <Qsci/qsciscintilla.h>
-#include <QMainWindow>
 class codeEditor : public QsciScintilla{
 public:
-    codeEditor(QMainWindow *parent = 0);
+    codeEditor();
     ~codeEditor();
     void loadFile(const QString &fileName);
-    bool saveFile(const QString &fileName);
+    bool saveFile();
+    bool maybeSave();
+    bool saveAs(const QString &fileName);
     void newFile();
+
     QString title;
 protected:
     void dragEnterEvent(QDragEnterEvent *event);
@@ -16,7 +18,6 @@ protected:
 private:
     bool SetupEditor();
     bool SetupKeyList();
-
     void setCurrentFile(const QString &fileName);
     QString strippedName(const QString &fullFileName);
 
