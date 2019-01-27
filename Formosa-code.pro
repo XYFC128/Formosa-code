@@ -31,6 +31,7 @@ win32: LIBS += -L$$PWD/Scintilla-win/ -lqscintilla2_qt5
 INCLUDEPATH += $$PWD/Scintilla-win
 DEPENDPATH += $$PWD/Scintilla-win
 
+
 unix: LIBS += -L$$PWD/Scintilla/ -lqscintilla2_qt5
 
 INCLUDEPATH += $$PWD/Scintilla

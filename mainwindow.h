@@ -22,7 +22,7 @@ private slots:
     void documentWasModified();
 
 private:
-    bool SetupEditor(QString s);
+    bool SetupEditor();
     bool SetupKeyList();
 
     void createActions();

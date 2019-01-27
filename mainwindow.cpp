@@ -26,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     SetupKeyList();
-    SetupEditor("txt");
+    SetupEditor();
     setCentralWidget(textEdit);
 
 
@@ -47,26 +47,7 @@ MainWindow::~MainWindow()
 
 }
 
-bool MainWindow::SetupEditor(QString s){
-    if(textEdit == nullptr) textEdit = new QsciScintilla;
-    if(s == "cpp"||s == "h"){
-        QsciLexerCPP *textLexer = new QsciLexerCPP;
-        textEdit->setLexer(textLexer);
-        QsciAPIs *apis = new QsciAPIs(textLexer);
-        foreach(const QString &keyword,cppkeylist){
-            apis->add(keyword);
-        }
-        apis->prepare();
-    }
-    else if (s == "py") {
-        QsciLexerPython *textLexer = new QsciLexerPython;
-        textEdit->setLexer(textLexer);
-        QsciAPIs *apis = new QsciAPIs(textLexer);
-        foreach(const QString &keyword,pykeylist){
-            apis->add(keyword);
-        }
-        apis->prepare();
-    }
+bool MainWindow::SetupEditor(){
 
     textEdit->setMarginType(0,QsciScintilla::NumberMargin);
     textEdit->setMarginLineNumbers(0,true);
@@ -279,7 +260,7 @@ void MainWindow::loadFile(const QString &fileName)
         return;
     }
 
-    SetupEditor(fileName.mid(fileName.lastIndexOf('.') + 1 ));
+    SetupEditor();
 
     QTextStream in(&file);
     QApplication::setOverrideCursor(Qt::WaitCursor);
@@ -312,7 +293,29 @@ bool MainWindow::saveFile(const QString &fileName)
 
 void MainWindow::setCurrentFile(const QString &fileName)
 {
+    if(textEdit == nullptr) textEdit = new QsciScintilla;
     curFile = fileName;
+    QString s = fileName.mid(fileName.lastIndexOf('.') + 1 );
+
+    if(s == "cpp"||s == "h"){
+        QsciLexerCPP *textLexer = new QsciLexerCPP;
+        textEdit->setLexer(textLexer);
+        QsciAPIs *apis = new QsciAPIs(textLexer);
+        foreach(const QString &keyword,cppkeylist){
+            apis->add(keyword);
+        }
+        apis->prepare();
+    }
+    else if (s == "py") {
+        QsciLexerPython *textLexer = new QsciLexerPython;
+        textEdit->setLexer(textLexer);
+        QsciAPIs *apis = new QsciAPIs(textLexer);
+        foreach(const QString &keyword,pykeylist){
+            apis->add(keyword);
+        }
+        apis->prepare();
+    }
+
     textEdit->setModified(false);
     setWindowModified(false);
 
