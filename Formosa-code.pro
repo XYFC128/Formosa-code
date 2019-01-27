@@ -15,24 +15,23 @@ macx {
 
 SOURCES += \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+    editor.cpp
 
 HEADERS += \
-        mainwindow.h
+        mainwindow.h \
+    editor.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+unix: LIBS += -L$$PWD/Scintilla/ -lqscintilla2_qt5
 
+INCLUDEPATH += $$PWD/Scintilla
+DEPENDPATH += $$PWD/Scintilla
 
 win32: LIBS += -L$$PWD/Scintilla-win/ -lqscintilla2_qt5
 
 INCLUDEPATH += $$PWD/Scintilla-win
 DEPENDPATH += $$PWD/Scintilla-win
-
-
-unix: LIBS += -L$$PWD/Scintilla/ -lqscintilla2_qt5
-
-INCLUDEPATH += $$PWD/Scintilla
-DEPENDPATH += $$PWD/Scintilla

@@ -14,63 +14,33 @@
 #include <QStatusBar>
 #include <QTextStream>
 #include <QToolBar>
+#include <QUrl>
+#include <QMimeData>
 
-#include <Qsci/qsciscintilla.h>
-#include <Qsci/qscilexercpp.h>
-#include <Qsci/qscilexerpython.h>
-#include <Qsci/qsciapis.h>
+#include <QDragEnterEvent>
 #include "mainwindow.h"
-
+#include "editor.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    SetupKeyList();
-    SetupEditor();
+    textEdit = new codeEditor;
     setCentralWidget(textEdit);
-
 
     createActions();
     createMenus();
     //createToolBars();
     createStatusBar();
-
     readSettings();
-
     connect(textEdit, SIGNAL(textChanged()),this, SLOT(documentWasModified()));
+    textEdit->newFile();
+    setWindowTitle(textEdit->title);
 
-    setCurrentFile("");
 }
 
 MainWindow::~MainWindow()
 {
 
-}
-
-bool MainWindow::SetupEditor(){
-
-    textEdit->setMarginType(0,QsciScintilla::NumberMargin);
-    textEdit->setMarginLineNumbers(0,true);
-    textEdit->setMarginWidth(0,31);
-
-    textEdit->setAutoCompletionSource(QsciScintilla::AcsAll);
-    textEdit->setAutoCompletionCaseSensitivity(true);
-    textEdit->setAutoCompletionThreshold(2);
-    textEdit->setFont(QFont("Courier New"));
-    textEdit->SendScintilla(QsciScintilla::SCI_SETCODEPAGE,QsciScintilla::SC_CP_UTF8);
-    return true;
-}
-bool MainWindow::SetupKeyList(){
-    cppkeylist<<"#include"<<"#define"<<"#ifndef"<<"#endef"<<"auto"<<"break"<<"case"<<"catch"
-              <<"char"<<"class"<<"const"<<"continue"<<"default"<<"delete"<<"double"<<"else"<<"enum"
-              <<"float"<<"for"<<"friend"<<"goto"<<"if"<<"inline"<<"int"<<"long"<<"new"<<"namespace"<<"operator"
-              <<"private"<<"protected"<<"public"<<"register"<<"return"<<"short"<<"signed"<<"sizeof"<<"static"
-              <<"struct"<<"switch"<<"template"<<"this"<<"throw"<<"try"<<"typedef"<<"union"<<"unsigned"
-              <<"using"<<"virtual"<<"while";
-    pykeylist<<"and"<<"del"<<"from"<<"not"<<"while"<<"as"<<"elif"<<"global"<<"with"
-             <<"assert"<<"else"<<"pass"<<"yield"<<"break"<<"except"<<"import"<<"print"<<"class"<<"exec"<<"raise"<<"continue"
-             <<"finally"<<"return"<<"for"<<"lambda"<<"try";
-    return  true;
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -83,11 +53,12 @@ void MainWindow::closeEvent(QCloseEvent *event)
     }
 }
 
+
 void MainWindow::newFile()
 {
     if (maybeSave()) {
-        textEdit->clear();
-        setCurrentFile("");
+        textEdit->newFile();
+        setWindowTitle(textEdit->title);
     }
 }
 
@@ -96,7 +67,9 @@ void MainWindow::open()
     if (maybeSave()) {
         QString fileName = QFileDialog::getOpenFileName(this);
         if (!fileName.isEmpty())
-            loadFile(fileName);
+            textEdit->loadFile(fileName);
+            setWindowTitle(textEdit->title);
+            statusBar()->showMessage(tr("檔案載入完成"), 2000);
     }
 }
 
@@ -105,17 +78,21 @@ bool MainWindow::save()
     if (curFile.isEmpty()) {
         return saveAs();
     } else {
-        return saveFile(curFile);
+        textEdit->saveFile(curFile);
+        setWindowTitle(textEdit->title);
+        return true;
     }
 }
 
 bool MainWindow::saveAs()
 {
+    statusBar()->showMessage(tr("儲存"), 2000);
     QString fileName = QFileDialog::getSaveFileName(this);
     if (fileName.isEmpty())
         return false;
-
-    return saveFile(fileName);
+    textEdit->saveFile(fileName);
+    setWindowTitle(textEdit->title);
+    return true;
 }
 
 void MainWindow::about()
@@ -129,6 +106,7 @@ void MainWindow::about()
 void MainWindow::documentWasModified()
 {
     setWindowModified(textEdit->isModified());
+    setWindowTitle(textEdit->title);
 }
 
 void MainWindow::createActions()
@@ -204,7 +182,6 @@ void MainWindow::createMenus()
     editMenu->addAction(copyAct);
     editMenu->addAction(pasteAct);
 
-    menuBar()->addSeparator();
 
     helpMenu = menuBar()->addMenu(tr("&幫助"));
     helpMenu->addAction(aboutAct);
@@ -218,11 +195,13 @@ void MainWindow::createStatusBar()
 
 void MainWindow::readSettings()
 {
+
     QSettings settings("Trolltech", "Application Example");
     QPoint pos = settings.value("pos", QPoint(200, 200)).toPoint();
     QSize size = settings.value("size", QSize(400, 400)).toSize();
     resize(size);
     move(pos);
+
 }
 
 void MainWindow::writeSettings()
@@ -247,88 +226,4 @@ bool MainWindow::maybeSave()
             return false;
     }
     return true;
-}
-
-void MainWindow::loadFile(const QString &fileName)
-{
-    QFile file(fileName);
-    if (!file.open(QFile::ReadOnly)) {
-        QMessageBox::warning(this, tr("警告"),
-                             tr("無法載入檔案餒 %1 \n錯誤資訊:%2.")
-                             .arg(fileName)
-                             .arg(file.errorString()));
-        return;
-    }
-
-    SetupEditor();
-
-    QTextStream in(&file);
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-    textEdit->setText(in.readAll());
-    QApplication::restoreOverrideCursor();
-    setCurrentFile(fileName);
-    statusBar()->showMessage(tr("檔案載入完成"), 2000);
-}
-
-bool MainWindow::saveFile(const QString &fileName)
-{
-    QFile file(fileName);
-    if (!file.open(QFile::WriteOnly)) {
-        QMessageBox::warning(this, tr("警告"),
-                             tr("無法寫入檔案 %1 \n 錯誤資訊:%2.")
-                             .arg(fileName)
-                             .arg(file.errorString()));
-        return false;
-    }
-
-    QTextStream out(&file);
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-    out << textEdit->text();
-    QApplication::restoreOverrideCursor();
-
-    setCurrentFile(fileName);
-    statusBar()->showMessage(tr("儲存成功"), 2000);
-    return true;
-}
-
-void MainWindow::setCurrentFile(const QString &fileName)
-{
-    if(textEdit == nullptr) textEdit = new QsciScintilla;
-    curFile = fileName;
-    QString s = fileName.mid(fileName.lastIndexOf('.') + 1 );
-
-    if(s == "cpp"||s == "h"){
-        QsciLexerCPP *textLexer = new QsciLexerCPP;
-        textEdit->setLexer(textLexer);
-        QsciAPIs *apis = new QsciAPIs(textLexer);
-        foreach(const QString &keyword,cppkeylist){
-            apis->add(keyword);
-        }
-        apis->prepare();
-    }
-    else if (s == "py") {
-        QsciLexerPython *textLexer = new QsciLexerPython;
-        textEdit->setLexer(textLexer);
-        QsciAPIs *apis = new QsciAPIs(textLexer);
-        foreach(const QString &keyword,pykeylist){
-            apis->add(keyword);
-        }
-        apis->prepare();
-    }
-
-    textEdit->setModified(false);
-    setWindowModified(false);
-
-    QString shownName;
-    if (curFile.isEmpty())
-        shownName = "untitled.txt";
-    else
-        shownName = strippedName(curFile);
-
-    setWindowTitle(tr("%1[*] - %2").arg(shownName).arg(tr("Formosa code")));
-}
-
-QString MainWindow::strippedName(const QString &fullFileName)
-{
-    return QFileInfo(fullFileName).fileName();
 }

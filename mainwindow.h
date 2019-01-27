@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <Qsci/qsciscintilla.h>
+#include "editor.h"
 
 class MainWindow : public QMainWindow
 {
@@ -22,8 +23,6 @@ private slots:
     void documentWasModified();
 
 private:
-    bool SetupEditor();
-    bool SetupKeyList();
 
     void createActions();
     void createMenus();
@@ -33,13 +32,8 @@ private:
     void writeSettings();
 
     bool maybeSave();
-    void loadFile(const QString &fileName);
-    bool saveFile(const QString &fileName);
-    void setCurrentFile(const QString &fileName);
-    QString strippedName(const QString &fullFileName);
 
-    QsciScintilla *textEdit;
-    QStringList cppkeylist,pykeylist;
+    codeEditor *textEdit;
     QString curFile;
     QMenu *fileMenu;
     QMenu *editMenu;
