@@ -17,6 +17,8 @@
 #include <QUrl>
 #include <QMimeData>
 #include <QDragEnterEvent>
+
+#include <QSysInfo>
 #include "mainwindow.h"
 #include "editor.h"
 #include "fileview.h"
@@ -24,6 +26,7 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    //QMessageBox::warning(this,"app",QSysInfo::kernelType());
     textEdit = new codeEditor;
     setCentralWidget(textEdit);
 
