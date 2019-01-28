@@ -3,9 +3,7 @@
 #include<QLabel>
 #include<QMessageBox>
 fileViewer::fileViewer(codeEditor *editor){
-    if(fileview == nullptr){
-        fileview = new FileViewWidget;
-    }
+    fileview = new FilelListView;
     if(editor == nullptr) throw;
     this->setWindowTitle("檔案瀏覽");
     this->setFeatures(QDockWidget::AllDockWidgetFeatures);
@@ -16,7 +14,7 @@ fileViewer::fileViewer(codeEditor *editor){
 fileViewer::~fileViewer(){
 
 }
-FileViewWidget::FileViewWidget()
+FilelListView::FilelListView()
 {
     //初始化指標
     fileLineEdit = new QLineEdit("/", this);
@@ -33,10 +31,15 @@ FileViewWidget::FileViewWidget()
     connect(fileListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
                 this, SLOT(slotDirShow(QListWidgetItem*)));
     //預設開啟資料夾為home
-    view("/home");
+    if(QSysInfo::kernelType() == "winnt"){
+        view("C:\\users");
+    }
+    else {
+        view("/home");
+    }
     setLayout(vLayout);
 }
-bool FileViewWidget::view(QString startStr){
+bool FilelListView::view(QString startStr){
     QDir dir(startStr);
     QStringList stringList;
     stringList << "*";
@@ -46,7 +49,7 @@ bool FileViewWidget::view(QString startStr){
     return true;
 }
 //顯示目前目錄中的文件
-void FileViewWidget::slotShow()
+void FilelListView::slotShow()
 {
      QDir dir(fileLineEdit->text());
      QStringList stringList;
@@ -56,7 +59,7 @@ void FileViewWidget::slotShow()
 }
 
 //雙擊事件
-void FileViewWidget::showFileInfoList(QFileInfoList list)
+void FilelListView::showFileInfoList(QFileInfoList list)
 {
     //清空列表控件
     fileListWidget->clear();
@@ -83,7 +86,7 @@ void FileViewWidget::showFileInfoList(QFileInfoList list)
 }
 
 //----根据用户的选择显示下一级目录下的文件，
-void FileViewWidget::slotDirShow(QListWidgetItem *Item)
+void FilelListView::slotDirShow(QListWidgetItem *Item)
 {
     //----保存下一级目录名
     QString string = Item->text();

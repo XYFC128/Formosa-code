@@ -13,11 +13,11 @@
 
 #include "editor.h"
 
-class FileViewWidget : public QWidget
+class FilelListView : public QWidget
 {
 Q_OBJECT
 public:
-    FileViewWidget();
+    FilelListView();
     void showFileInfoList(QFileInfoList list);
     codeEditor *editor;
     bool view(QString);
@@ -34,11 +34,12 @@ private:
 };
 
 class fileViewer:public QDockWidget{
+Q_OBJECT
 public:
     fileViewer(codeEditor*);
     ~fileViewer();
 private:
-    FileViewWidget *fileview;
+    FilelListView *fileview;
 };
 
 #endif // FILEVIEW_H
