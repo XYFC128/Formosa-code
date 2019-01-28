@@ -16,12 +16,16 @@ macx {
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    editor.cpp
+    editor.cpp \
+    fileview.cpp
 
 HEADERS += \
         mainwindow.h \
-    editor.h
-
+    editor.h \
+    fileview.h
+RESOURCES += \
+            file.png \
+            folder.png
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
@@ -35,3 +39,5 @@ win32: LIBS += -L$$PWD/Scintilla-win/ -lqscintilla2_qt5
 
 INCLUDEPATH += $$PWD/Scintilla-win
 DEPENDPATH += $$PWD/Scintilla-win
+
+DISTFILES +=
