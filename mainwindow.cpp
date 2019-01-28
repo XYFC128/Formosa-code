@@ -46,16 +46,22 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-
+    delete textEdit;
+    delete fileManger;
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    if (textEdit->maybeSave()) {
-        writeSettings();
-        event->accept();
+    if (textEdit->isModified()) {
+        if(textEdit->maybeSave()){
+            writeSettings();
+            event->accept();
+        }
+        else {
+            event->ignore();
+        }
     } else {
-        event->ignore();
+        event->accept();
     }
 }
 
@@ -82,7 +88,7 @@ void MainWindow::open()
 
 bool MainWindow::save()
 {
-    if (curFile.isEmpty()) {
+    if (textEdit->curFile.isEmpty()) {
         return saveAs();
     } else {
         textEdit->saveFile();
@@ -112,8 +118,8 @@ void MainWindow::about()
 
 void MainWindow::documentWasModified()
 {
-    setWindowModified(textEdit->isModified());
     setWindowTitle(textEdit->title);
+    setWindowModified(textEdit->isModified());
 }
 
 void MainWindow::createActions()

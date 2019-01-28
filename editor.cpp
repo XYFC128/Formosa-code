@@ -82,22 +82,29 @@ bool codeEditor::saveAs(const QString &fileName)
     setCurrentFile(fileName);
     return true;
 }
-void codeEditor::loadFile(const QString &fileName)
+bool codeEditor::loadFile(const QString &fileName)
 {
+    if(this->isModified()){
+        if(!maybeSave()){
+            return false;
+        }
+    }
+    this->clear();
     QFile file(fileName);
     if (!file.open(QFile::ReadOnly)) {
         QMessageBox::warning(this, tr("警告"),
                              tr("無法載入檔案餒 %1:%2")
                              .arg(fileName)
                              .arg(file.errorString()));
-        return;
+        return false;
     }
-    this->setModified(false);
     setCurrentFile(fileName);
     QTextStream in(&file);
     QApplication::setOverrideCursor(Qt::WaitCursor);
     this->setText(in.readAll());
+    this->setModified(false);
     QApplication::restoreOverrideCursor();
+    return true;
 }
 void codeEditor::setCurrentFile(const QString &fileName)
 {

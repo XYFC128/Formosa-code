@@ -5,13 +5,14 @@ class codeEditor : public QsciScintilla{
 public:
     codeEditor();
     ~codeEditor();
-    void loadFile(const QString &fileName);
+    bool loadFile(const QString &fileName);
     bool saveFile();
     bool maybeSave();
     bool saveAs(const QString &fileName);
     void newFile();
 
     QString title;
+    QString curFile;
 protected:
     void dragEnterEvent(QDragEnterEvent *event);
     void dropEvent(QDropEvent *event);
@@ -22,7 +23,6 @@ private:
     QString strippedName(const QString &fullFileName);
 
     QStringList cppkeylist,pykeylist;
-    QString curFile;
 };
 
 #endif // EDITOR_H
