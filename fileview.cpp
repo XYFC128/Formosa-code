@@ -12,7 +12,7 @@ fileViewer::fileViewer(codeEditor *editor){
     this->setWidget(fileview);
 }
 fileViewer::~fileViewer(){
-
+    delete fileview;
 }
 FilelListView::FilelListView()
 {
@@ -38,6 +38,12 @@ FilelListView::FilelListView()
         view("/home");
     }
     setLayout(vLayout);
+}
+FilelListView::~FilelListView(){
+    delete fileLineEdit;
+    delete fileListWidget;
+    delete vLayout;
+    delete editor;
 }
 bool FilelListView::view(QString startStr){
     QDir dir(startStr);
@@ -96,7 +102,7 @@ void FilelListView::slotDirShow(QListWidgetItem *Item)
     //-----重新设置路径
     QFileInfo FileInfo(fileLineEdit->text()+"/"+string);
     if(FileInfo.isFile()) {
-        editor->loadFile(fileLineEdit->text()+"/"+string);
+        editor->open(fileLineEdit->text()+"/"+string);
     }
     else {
         dir.cd(string);

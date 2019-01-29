@@ -18,6 +18,7 @@ class FilelListView : public QWidget
 Q_OBJECT
 public:
     FilelListView();
+    ~FilelListView();
     void showFileInfoList(QFileInfoList list);
     codeEditor *editor;
     bool view(QString);

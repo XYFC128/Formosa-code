@@ -76,13 +76,9 @@ void MainWindow::newFile()
 
 void MainWindow::open()
 {
-    if (textEdit->maybeSave()) {
-        QString fileName = QFileDialog::getOpenFileName(this);
-        if (!fileName.isEmpty()){
-            textEdit->loadFile(fileName);
-            setWindowTitle(textEdit->title);
-            statusBar()->showMessage(tr("檔案載入完成"), 2000);
-        }
+    if (textEdit->open()){
+        setWindowTitle(textEdit->title);
+        statusBar()->showMessage(tr("檔案載入完成"), 2000);
     }
 }
 
@@ -91,7 +87,7 @@ bool MainWindow::save()
     if (textEdit->curFile.isEmpty()) {
         return saveAs();
     } else {
-        textEdit->saveFile();
+        textEdit->save();
         setWindowTitle(textEdit->title);
         return true;
     }
@@ -99,11 +95,8 @@ bool MainWindow::save()
 
 bool MainWindow::saveAs()
 {
-    statusBar()->showMessage(tr("儲存"), 2000);
-    QString fileName = QFileDialog::getSaveFileName(this);
-    if (fileName.isEmpty())
-        return false;
-    textEdit->saveAs(fileName);
+    statusBar()->showMessage(tr("另存新檔"), 2000);
+    textEdit->saveAs();
     setWindowTitle(textEdit->title);
     return true;
 }
