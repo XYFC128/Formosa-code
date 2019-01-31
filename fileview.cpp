@@ -74,16 +74,25 @@ void FilelListView::showFileInfoList(QFileInfoList list)
     for (unsigned int i = 0; i < list.count(); i++)
     {
         QFileInfo tmpFileInfo = list.at(i);
-        if (tmpFileInfo.isDir())
+        if(tmpFileInfo.fileName()=="."){
+            continue;
+        }
+        else if (tmpFileInfo.fileName()=="..") {
+            QIcon icon(":/image/back.png");
+            QString fileName = tmpFileInfo.fileName();
+            QListWidgetItem*tmpListWidgetItem = new QListWidgetItem(icon,fileName);
+            fileListWidget->addItem(tmpListWidgetItem);
+        }
+        else if (tmpFileInfo.isDir())
         {
-            QIcon icon(":/folder.png");
+            QIcon icon(":/image/folder.png");
             QString fileName = tmpFileInfo.fileName();
             QListWidgetItem*tmpListWidgetItem = new QListWidgetItem(icon,fileName);
             fileListWidget->addItem(tmpListWidgetItem);
         }
         else
         {
-            QIcon icon(":/file.png");
+            QIcon icon(":/image/file.png");
             QString fileName = tmpFileInfo.fileName();
             QListWidgetItem*tmpListWidgetItem = new QListWidgetItem(icon,fileName);
             fileListWidget->addItem(tmpListWidgetItem);

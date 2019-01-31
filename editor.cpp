@@ -119,7 +119,10 @@ void codeEditor::setCurrentFile(const QString &fileName)
         shownName = strippedName(curFile);
     }
 
-    if(textLexer != nullptr) delete textLexer;
+    if(textLexer != nullptr) {
+        delete textLexer;
+        textLexer = nullptr;
+    }
 
     QString s = shownName.mid(shownName.lastIndexOf('.') + 1 );
     if(s == "cpp"||s == "h"){
