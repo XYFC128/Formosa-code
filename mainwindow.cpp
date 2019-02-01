@@ -22,24 +22,25 @@
 #include "mainwindow.h"
 #include "editor.h"
 #include "fileview.h"
+#include "tab.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     //QMessageBox::warning(this,"app",QSysInfo::kernelType());
     textEdit = new codeEditor;
-    setCentralWidget(textEdit);
 
     createActions();
     createMenus();
-    //createToolBars();
     createStatusBar();
     readSettings();
-    connect(textEdit, SIGNAL(textChanged()),this, SLOT(documentWasModified()));
-    textEdit->newFile();
-    setWindowTitle(textEdit->title);
+    //connect(textEdit, SIGNAL(textChanged()),this, SLOT(documentWasModified()));
+    //textEdit->newFile();
 
-    fileManger = new fileViewer(textEdit);
+    bookmark = new Tab;
+    setCentralWidget(bookmark);
+    setWindowTitle("Formosa-code");
+    fileManger = new fileViewer(bookmark);
     addDockWidget(Qt::RightDockWidgetArea,fileManger);
 
 }
@@ -48,21 +49,13 @@ MainWindow::~MainWindow()
 {
     delete textEdit;
     delete fileManger;
+    delete bookmark;
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    if (textEdit->isModified()) {
-        if(textEdit->maybeSave()){
-            writeSettings();
-            event->accept();
-        }
-        else {
-            event->ignore();
-        }
-    } else {
-        event->accept();
-    }
+    event->accept();
+    return;
 }
 
 
@@ -76,27 +69,20 @@ void MainWindow::newFile()
 
 void MainWindow::open()
 {
-    if (textEdit->open()){
-        setWindowTitle(textEdit->title);
+    if (bookmark->open()){
         statusBar()->showMessage(tr("檔案載入完成"), 2000);
     }
 }
 
 bool MainWindow::save()
 {
-    if (textEdit->curFile.isEmpty()) {
-        return saveAs();
-    } else {
-        textEdit->save();
-        setWindowTitle(textEdit->title);
-        return true;
-    }
+    return bookmark->save();
 }
 
 bool MainWindow::saveAs()
 {
     statusBar()->showMessage(tr("另存新檔"), 2000);
-    textEdit->saveAs();
+    bookmark->saveAs();
     setWindowTitle(textEdit->title);
     return true;
 }
@@ -111,7 +97,7 @@ void MainWindow::about()
 
 void MainWindow::documentWasModified()
 {
-    setWindowTitle(textEdit->title);
+    bookmark->setTabText(0,textEdit->title);
     setWindowModified(textEdit->isModified());
 }
 

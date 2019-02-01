@@ -6,6 +6,7 @@
 #include <Qsci/qsciscintilla.h>
 #include "editor.h"
 #include "fileview.h"
+#include "tab.h"
 
 class MainWindow : public QMainWindow
 {
@@ -34,6 +35,7 @@ private:
     void writeSettings();
 
     codeEditor *textEdit;
+    Tab *bookmark;
     QString curFile;
     QMenu *fileMenu;
     QMenu *editMenu;

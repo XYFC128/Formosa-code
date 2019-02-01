@@ -5,7 +5,6 @@
 #include <QFileInfo>
 #include <QUrl>
 #include <QMimeData>
-#include <QFileDialog>
 #include <Qsci/qsciscintilla.h>
 #include <Qsci/qscilexercpp.h>
 #include <Qsci/qscilexerpython.h>
@@ -45,6 +44,9 @@ bool codeEditor::SetupKeyList(){
 }
 bool codeEditor::save()
 {
+    if(curFile.isEmpty()){
+        return false;
+    }
     QFile file(curFile);
     if (!file.open(QFile::WriteOnly)) {
         QMessageBox::warning(this, tr("警告"),
@@ -62,27 +64,13 @@ bool codeEditor::save()
     setCurrentFile(curFile);
     return true;
 }
-bool codeEditor::saveAs()
+bool codeEditor::saveAs(QString fileName)
 {
-    QString fileName = QFileDialog::getSaveFileName(this);
     if(fileName.isEmpty()){
         return false;
     }
-    QFile file(fileName);
-    if (!file.open(QFile::WriteOnly)) {
-        QMessageBox::warning(this, tr("警告"),
-                             tr("無法寫入檔案 %1 \n 錯誤資訊:%2.")
-                             .arg(fileName)
-                             .arg(file.errorString()));
-        return false;
-    }
-
-    QTextStream out(&file);
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-    out << this->text();
-    QApplication::restoreOverrideCursor();
-    this->setModified(false);
-    setCurrentFile(fileName);
+    curFile = fileName;
+    save();
     return true;
 }
 bool codeEditor::loadFile(const QString &fileName)
@@ -119,10 +107,6 @@ void codeEditor::setCurrentFile(const QString &fileName)
         shownName = strippedName(curFile);
     }
 
-    if(textLexer != nullptr) {
-        delete textLexer;
-        textLexer = nullptr;
-    }
 
     QString s = shownName.mid(shownName.lastIndexOf('.') + 1 );
     if(s == "cpp"||s == "h"){
@@ -146,7 +130,7 @@ void codeEditor::setCurrentFile(const QString &fileName)
     else{
         this->setLexer(0);
     }
-    title = QString("%1 [*] - %2").arg(shownName).arg("Formosa code");
+    title = QString("%1").arg(shownName);
 }
 QString codeEditor::strippedName(const QString &fullFileName)
 {
@@ -154,7 +138,7 @@ QString codeEditor::strippedName(const QString &fullFileName)
 }
 void codeEditor::newFile(){
     this->clear();
-    this->setModified(true);
+    this->setModified(false);
     this->setCurrentFile("");
 }
 void codeEditor::dragEnterEvent(QDragEnterEvent *event){
@@ -188,11 +172,4 @@ bool codeEditor::maybeSave(){
             return false;
     }
     return true;
-}
-bool codeEditor::open(){
-    QString fileName = QFileDialog::getOpenFileName(this);
-    return loadFile(fileName);
-}
-bool codeEditor::open(const QString &fileName){
-    return loadFile(fileName);
 }

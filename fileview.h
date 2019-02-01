@@ -11,7 +11,7 @@
 #include <QIcon>
 #include <QStringList>
 
-#include "editor.h"
+#include "tab.h"
 
 class FilelListView : public QWidget
 {
@@ -20,7 +20,7 @@ public:
     FilelListView();
     ~FilelListView();
     void showFileInfoList(QFileInfoList list);
-    codeEditor *editor;
+    Tab *editor;
     bool view(QString);
 
 private slots:
@@ -37,7 +37,7 @@ private:
 class fileViewer:public QDockWidget{
 Q_OBJECT
 public:
-    fileViewer(codeEditor*);
+    fileViewer(Tab*);
     ~fileViewer();
 private:
     FilelListView *fileview;

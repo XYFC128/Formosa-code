@@ -2,7 +2,7 @@
 #include<QTextCodec>
 #include<QLabel>
 #include<QMessageBox>
-fileViewer::fileViewer(codeEditor *editor){
+fileViewer::fileViewer(Tab *editor){
     fileview = new FilelListView;
     if(editor == nullptr) throw;
     this->setWindowTitle("檔案瀏覽");
@@ -43,7 +43,7 @@ FilelListView::~FilelListView(){
     delete fileLineEdit;
     delete fileListWidget;
     delete vLayout;
-    delete editor;
+    editor = nullptr;
 }
 bool FilelListView::view(QString startStr){
     QDir dir(startStr);
@@ -111,7 +111,7 @@ void FilelListView::slotDirShow(QListWidgetItem *Item)
     //-----重新设置路径
     QFileInfo FileInfo(fileLineEdit->text()+"/"+string);
     if(FileInfo.isFile()) {
-        editor->open(fileLineEdit->text()+"/"+string);
+        editor->add(fileLineEdit->text()+"/"+string);
     }
     else {
         dir.cd(string);

@@ -5,12 +5,11 @@ class codeEditor : public QsciScintilla{
 public:
     codeEditor();
     ~codeEditor();
-    bool open();
-    bool open(const QString &fileName);
     bool save();
     bool maybeSave();
-    bool saveAs();
+    bool saveAs(QString);
     void newFile();
+    bool loadFile(const QString &fileName);
 
     QString title;
     QString curFile;
@@ -21,7 +20,6 @@ private:
     bool SetupEditor();
     bool SetupKeyList();
     void setCurrentFile(const QString &fileName);
-    bool loadFile(const QString &fileName);
     QString strippedName(const QString &fullFileName);
 
     QsciLexer *textLexer;

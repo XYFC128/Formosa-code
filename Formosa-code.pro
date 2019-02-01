@@ -17,12 +17,14 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     editor.cpp \
-    fileview.cpp
+    fileview.cpp \
+    tab.cpp
 
 HEADERS += \
         mainwindow.h \
     editor.h \
-    fileview.h
+    fileview.h \
+    tab.h
 RESOURCES += \
             resource.qrc
 # Default rules for deployment.
