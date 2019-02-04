@@ -17,21 +17,22 @@ class FilelListView : public QWidget
 {
 Q_OBJECT
 public:
-    FilelListView();
-    ~FilelListView();
-    void showFileInfoList(QFileInfoList list);
-    Tab *editor;
+         FilelListView();
     bool view(QString);
+    void showFileInfoList(QFileInfoList list);
+         ~FilelListView();
+
+    Tab *editor;
 
 private slots:
     void slotShow();
     void slotDirShow(QListWidgetItem *Item);
 
 private:
-    QLineEdit *fileLineEdit;
-    QListWidget *fileListWidget;
-    QVBoxLayout *vLayout;
-    QFileInfoList list;
+    QFileInfoList   list;
+    QLineEdit       *fileLineEdit;
+    QListWidget     *fileListWidget;
+    QVBoxLayout     *vLayout;
 };
 
 class fileViewer:public QDockWidget{

@@ -3,27 +3,25 @@
 #include <Qsci/qsciscintilla.h>
 class codeEditor : public QsciScintilla{
 public:
-    codeEditor();
-    ~codeEditor();
-    bool save();
-    bool maybeSave();
-    bool saveAs(QString);
-    void newFile();
     bool loadFile(const QString &fileName);
+    bool maybeSave();
+    bool save();
+    bool saveAs(QString);
+         codeEditor();
+    void newFile();
+         ~codeEditor();
 
-    QString title;
     QString curFile;
-protected:
-    void dragEnterEvent(QDragEnterEvent *event);
-    void dropEvent(QDropEvent *event);
+    QString title;
+
 private:
-    bool SetupEditor();
-    bool SetupKeyList();
-    void setCurrentFile(const QString &fileName);
     QString strippedName(const QString &fullFileName);
+    bool    SetupEditor();
+    bool    SetupKeyList();
+    void    setCurrentFile(const QString &fileName);
 
-    QsciLexer *textLexer;
-    QStringList cppkeylist,pykeylist;
+    QsciLexer*textLexer;
+    QStringList cppkeylist,
+    pykeylist;
 };
-
 #endif // EDITOR_H

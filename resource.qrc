@@ -3,5 +3,7 @@
         <file>image/back.png</file>
         <file>image/file.png</file>
         <file>image/folder.png</file>
+        <file>image/dot.png</file>
+        <file>image/null.png</file>
     </qresource>
 </RCC>

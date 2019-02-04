@@ -4,7 +4,6 @@
 #include <QMainWindow>
 #include <QDockWidget>
 #include <Qsci/qsciscintilla.h>
-#include "editor.h"
 #include "fileview.h"
 #include "tab.h"
 
@@ -18,40 +17,38 @@ public:
 protected:
     void closeEvent(QCloseEvent *event);
 private slots:
-    void newFile();
-    void open();
     bool save();
     bool saveAs();
     void about();
-    void documentWasModified();
+    void copy();
+    void cut();
+    void newFile();
+    void open();
+    void paste();
 
 private:
-
     void createActions();
     void createMenus();
     void createStatusBar();
-
     void readSettings();
     void writeSettings();
 
-    codeEditor *textEdit;
-    Tab *bookmark;
-    QString curFile;
-    QMenu *fileMenu;
-    QMenu *editMenu;
-    QMenu *helpMenu;
-    fileViewer *fileManger;
+    QMenu       *editMenu;
+    QMenu       *fileMenu;
+    QMenu       *helpMenu;
+    QString     curFile;
+    Tab         *bookmark;
+    fileViewer  *fileManger;
 
+    QAction *aboutAct;
+    QAction *copyAct;
+    QAction *cutAct;
+    QAction *exitAct;
     QAction *newAct;
     QAction *openAct;
+    QAction *pasteAct;
     QAction *saveAct;
     QAction *saveAsAct;
-    QAction *exitAct;
-    QAction *cutAct;
-    QAction *copyAct;
-    QAction *pasteAct;
-    QAction *aboutAct;
-    QAction *aboutQtAct;
 };
 
 #endif // MAINWINDOW_H

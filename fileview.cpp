@@ -16,21 +16,21 @@ fileViewer::~fileViewer(){
 }
 FilelListView::FilelListView()
 {
-    //初始化指標
+    //initialization pointer
     fileLineEdit = new QLineEdit("/", this);
     fileListWidget = new QListWidget(this);
 
-    //---布局
+    //initialization layout
     vLayout = new QVBoxLayout(this);
     vLayout->addWidget(fileLineEdit);
     vLayout->addWidget(fileListWidget);
 
-    //--綁定事件
+    //connect event
     connect(fileLineEdit, SIGNAL(returnPressed()),
-                this, SLOT(slotShow()));
+            this, SLOT(slotShow()));
     connect(fileListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
-                this, SLOT(slotDirShow(QListWidgetItem*)));
-    //預設開啟資料夾為home
+            this, SLOT(slotDirShow(QListWidgetItem*)));
+    //set defult folder
     if(QSysInfo::kernelType() == "winnt"){
         view("C:\\users");
     }
@@ -54,17 +54,14 @@ bool FilelListView::view(QString startStr){
     fileLineEdit->setText(startStr);
     return true;
 }
-//顯示目前目錄中的文件
 void FilelListView::slotShow()
 {
-     QDir dir(fileLineEdit->text());
-     QStringList stringList;
-     stringList << "*";
-     QFileInfoList InfoList = dir.entryInfoList(stringList, QDir :: AllEntries, QDir :: DirsFirst);
-     showFileInfoList(InfoList);
+    QDir dir(fileLineEdit->text());
+    QStringList stringList;
+    stringList << "*";
+    QFileInfoList InfoList = dir.entryInfoList(stringList, QDir :: AllEntries, QDir :: DirsFirst);
+    showFileInfoList(InfoList);
 }
-
-//雙擊事件
 void FilelListView::showFileInfoList(QFileInfoList list)
 {
     //清空列表控件
@@ -99,8 +96,6 @@ void FilelListView::showFileInfoList(QFileInfoList list)
         }
     }
 }
-
-//----根据用户的选择显示下一级目录下的文件，
 void FilelListView::slotDirShow(QListWidgetItem *Item)
 {
     //----保存下一级目录名

@@ -27,15 +27,10 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    //QMessageBox::warning(this,"app",QSysInfo::kernelType());
-    textEdit = new codeEditor;
-
     createActions();
     createMenus();
     createStatusBar();
     readSettings();
-    //connect(textEdit, SIGNAL(textChanged()),this, SLOT(documentWasModified()));
-    //textEdit->newFile();
 
     bookmark = new Tab;
     setCentralWidget(bookmark);
@@ -44,63 +39,44 @@ MainWindow::MainWindow(QWidget *parent)
     addDockWidget(Qt::RightDockWidgetArea,fileManger);
 
 }
-
 MainWindow::~MainWindow()
 {
-    delete textEdit;
     delete fileManger;
     delete bookmark;
 }
-
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    event->accept();
+    if(bookmark->closeAll())
+        event->accept();
     return;
 }
-
-
 void MainWindow::newFile()
 {
-    if (textEdit->maybeSave()) {
-        textEdit->newFile();
-        setWindowTitle(textEdit->title);
-    }
+    bookmark->add("");
 }
-
 void MainWindow::open()
 {
     if (bookmark->open()){
         statusBar()->showMessage(tr("檔案載入完成"), 2000);
     }
 }
-
 bool MainWindow::save()
 {
     return bookmark->save();
 }
-
 bool MainWindow::saveAs()
 {
     statusBar()->showMessage(tr("另存新檔"), 2000);
     bookmark->saveAs();
-    setWindowTitle(textEdit->title);
     return true;
 }
-
 void MainWindow::about()
 {
-   QMessageBox::about(this, tr("關於Formosa code"),
-            tr("<b>Formosa code</b>是我在閒暇時間開發的一款文字編輯器<br>"
-               "支援基本的語法高亮和自動完成程式碼<br>"
-               "感謝您的使用<br>"));
+    QMessageBox::about(this, tr("關於Formosa code"),
+                       tr("<b>Formosa code</b>是我在閒暇時間開發的一款文字編輯器<br>"
+                          "支援基本的語法高亮和自動完成程式碼<br>"
+                          "感謝您的使用<br>"));
 }
-
-void MainWindow::documentWasModified()
-{
-    bookmark->setTabText(0,textEdit->title);
-    setWindowModified(textEdit->isModified());
-}
-
 void MainWindow::createActions()
 {
     newAct = new QAction(tr("新增"), this);
@@ -119,7 +95,6 @@ void MainWindow::createActions()
     connect(saveAct, SIGNAL(triggered()), this, SLOT(save()));
 
     saveAsAct = new QAction(tr("另存新檔..."), this);
-    saveAsAct->setShortcut(tr("Ctrl+Shift+S"));
     saveAsAct->setStatusTip(tr("將檔案儲存成其他名稱"));
     connect(saveAsAct, SIGNAL(triggered()), this, SLOT(saveAs()));
 
@@ -131,34 +106,24 @@ void MainWindow::createActions()
     cutAct = new QAction(tr("剪下"), this);
     cutAct->setShortcut(tr("Ctrl+X"));
     cutAct->setStatusTip(tr("剪下所選內容"));
-    connect(cutAct, SIGNAL(triggered()), textEdit, SLOT(cut()));
+    connect(cutAct, SIGNAL(triggered()), this, SLOT(cut()));
 
     copyAct = new QAction(tr("複製"), this);
     copyAct->setShortcut(tr("Ctrl+C"));
     copyAct->setStatusTip(tr("複製所選內容"));
-    connect(copyAct, SIGNAL(triggered()), textEdit, SLOT(copy()));
+    connect(copyAct, SIGNAL(triggered()), this, SLOT(copy()));
 
     pasteAct = new QAction(tr("貼上"), this);
     pasteAct->setShortcut(tr("Ctrl+V"));
     pasteAct->setStatusTip(tr("貼上剪貼簿內容"));
-    connect(pasteAct, SIGNAL(triggered()), textEdit, SLOT(paste()));
+    connect(pasteAct, SIGNAL(triggered()), this, SLOT(paste()));
 
     aboutAct = new QAction(tr("關於"), this);
     aboutAct->setStatusTip(tr("關於本程式"));
     connect(aboutAct, SIGNAL(triggered()), this, SLOT(about()));
 
-    aboutQtAct = new QAction(tr("About &Qt"), this);
-    aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
-    connect(aboutQtAct, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
 
-    cutAct->setEnabled(false);
-    copyAct->setEnabled(false);
-    connect(textEdit, SIGNAL(copyAvailable(bool)),
-            cutAct, SLOT(setEnabled(bool)));
-    connect(textEdit, SIGNAL(copyAvailable(bool)),
-            copyAct, SLOT(setEnabled(bool)));
 }
-
 void MainWindow::createMenus()
 {
     fileMenu = menuBar()->addMenu(tr("檔案"));
@@ -177,14 +142,11 @@ void MainWindow::createMenus()
 
     helpMenu = menuBar()->addMenu(tr("幫助"));
     helpMenu->addAction(aboutAct);
-    helpMenu->addAction(aboutQtAct);
 }
-
 void MainWindow::createStatusBar()
 {
     statusBar()->showMessage(tr("就緒"));
 }
-
 void MainWindow::readSettings()
 {
 
@@ -195,11 +157,18 @@ void MainWindow::readSettings()
     move(pos);
 
 }
-
 void MainWindow::writeSettings()
 {
     QSettings settings("Trolltech", "Application Example");
     settings.setValue("pos", pos());
     settings.setValue("size", size());
 }
-
+void MainWindow::cut(){
+    bookmark->cut();
+}
+void MainWindow::copy(){
+    bookmark->copy();
+}
+void MainWindow::paste(){
+    bookmark->paste();
+}
