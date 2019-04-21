@@ -73,14 +73,14 @@ bool Tab::save(){
     return true;
 }
 bool Tab::saveAs(){
+    int index = this->currentIndex();
     QString file = QFileDialog::getSaveFileName(this);
     if(file.isEmpty()){
         return false;
     }
     getCurrentEditor()->saveAs(file);
-    QIcon icon;
-    icon.addFile(":/image/null.png");
-    setTabIcon(this->currentIndex(),icon);
+    add(file);
+    close(index);
     return true;
 }
 bool Tab::open(){
